@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { api, useAuth } from '../context/AuthContext.jsx';
 import { LogIn, Mail, Lock } from 'lucide-react';
@@ -76,7 +76,13 @@ const Login = () => {
           </button>
         </form>
         
-        <div className="p-6 bg-slate-50 border-t border-slate-100 text-center">
+        <div className="p-6 bg-slate-50 border-t border-slate-100 text-center space-y-3">
+          <p className="text-sm text-slate-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-blue-600 font-semibold hover:underline decoration-2 underline-offset-4">
+              Create account
+            </Link>
+          </p>
           <p className="text-xs text-slate-500">
             Authorized access only. All activities are monitored.
           </p>

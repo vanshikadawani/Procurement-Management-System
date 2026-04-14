@@ -14,6 +14,7 @@ import PODetail from './pages/PODetail.jsx';
 import Invoices from './pages/Invoices.jsx';
 import Payments from './pages/Payments.jsx';
 import Reports from './pages/Reports.jsx';
+import Register from './pages/Register.jsx';
 
 const Placeholder = ({ title }) =>
 <div className="p-8">
@@ -29,6 +30,7 @@ export default function App() {
         <div className="min-h-screen bg-slate-50">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
