@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../context/AuthContext.jsx';
 import { ArrowLeft, FileText, Calendar, Building2, Hash, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { formatCurrency } from '../utils/currency';
+import { downloadPDF } from '../utils/download';
+
 
 const PODetail = () => {
   const { id } = useParams();
@@ -109,9 +112,11 @@ const PODetail = () => {
                         <tr key={idx} className="hover:bg-slate-50 transition-colors">
                           <td className="px-4 py-4 text-slate-900 font-medium">{item.itemName}</td>
                           <td className="px-4 py-4 text-center text-slate-600">{item.quantity}</td>
-                          <td className="px-4 py-4 text-right text-slate-600">${item.unitPrice.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-right text-slate-600">{formatCurrency(item.unitPrice)}</td>
+
                           <td className="px-4 py-4 text-right text-slate-600">{item.tax}%</td>
-                          <td className="px-4 py-4 text-right font-bold text-slate-900">${itemTotal.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-right font-bold text-slate-900">{formatCurrency(itemTotal)}</td>
+
                         </tr>);
 
                     })}
@@ -129,19 +134,23 @@ const PODetail = () => {
             <div className="space-y-4">
               <div className="flex justify-between text-slate-600">
                 <span>Subtotal</span>
-                <span className="font-medium">${po.subtotal.toLocaleString()}</span>
+                <span className="font-medium">{formatCurrency(po.subtotal)}</span>
+
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Tax</span>
-                <span className="font-medium">${po.tax.toLocaleString()}</span>
+                <span className="font-medium">{formatCurrency(po.tax)}</span>
+
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Discount</span>
-                <span className="font-medium">-${po.discount.toLocaleString()}</span>
+                <span className="font-medium">-{formatCurrency(po.discount)}</span>
+
               </div>
               <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
                 <span className="text-lg font-bold text-slate-900">Grand Total</span>
-                <span className="text-2xl font-bold text-blue-600">${po.grandTotal.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-blue-600">{formatCurrency(po.grandTotal)}</span>
+
               </div>
             </div>
           </div>
@@ -151,7 +160,13 @@ const PODetail = () => {
             <h3 className="text-lg font-bold text-slate-900 mb-6">Actions</h3>
             <div className="space-y-3">
               <button
-                onClick={() => window.open(`/api/pdf/po/${po._id}`, '_blank')}
+                onClick={async () => {
+                  try {
+                    await downloadPDF(`/pdf/po/${po._id}`, `po-${po.poNumber}.pdf`);
+                  } catch (err) {
+                    toast.error(err.message);
+                  }
+                }}
                 className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-xl hover:bg-slate-800 transition-all font-bold shadow-sm">
                 
                 <FileText size={18} />

@@ -325,7 +325,10 @@
             <div class="company-details">
                 <div class="company-logo-area">
                     <div class="logo-icon">M</div>
-                    <h1 class="company-name">MERN Procurement</h1>
+                    <div>
+                        <h1 class="company-name">MERN Procurement</h1>
+                        <p style="margin: 0; font-size: 10px; color: var(--slate-500); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Procurement Management</p>
+                    </div>
                 </div>
                 <div class="company-address">
                     123 Business Avenue, Tech Park<br>
@@ -399,8 +402,8 @@
                         <p class="item-desc"><%= item.itemName || item.description %></p>
                     </td>
                     <td><%= item.quantity || item.qty || 1 %></td>
-                    <td>$<%= (item.unitPrice || item.price || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
-                    <td>$<%= ((item.quantity || item.qty || 1) * (item.unitPrice || item.price || 0)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+                    <td>₹<%= (item.unitPrice || item.price || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+                    <td>₹<%= ((item.quantity || item.qty || 1) * (item.unitPrice || item.price || 0)).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
                 </tr>
                 <% }) %>
             </tbody>
@@ -411,7 +414,7 @@
             <div class="summary-box">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span class="summary-value">$<%= (doc.subtotal || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span class="summary-value">₹<%= (doc.subtotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
                 <div class="summary-row">
                     <% 
@@ -419,27 +422,27 @@
                     if(doc.items && doc.items[0]) taxRate = doc.items[0].tax;
                     %>
                     <span>Tax (<%= taxRate %>%)</span>
-                    <span class="summary-value">$<%= (doc.tax || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span class="summary-value">₹<%= (doc.tax || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
                 
                 <div class="summary-row total">
                     <span>Grand Total</span>
-                    <span>$<%= (doc.grandTotal || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span>₹<%= (doc.grandTotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
 
                 <% if(typeof totalPaid !== 'undefined') { %>
                 <div class="summary-row paid">
                     <span>Amount Paid</span>
-                    <span class="summary-value">-$<%= (totalPaid || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span class="summary-value">-₹<%= (totalPaid || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
                 <div class="summary-row due">
                     <span>Balance Due</span>
-                    <span class="summary-value">$<%= (amountDue || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span class="summary-value">₹<%= (amountDue || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
                 <% } else { %>
                 <div class="summary-row due">
                     <span>Amount Due</span>
-                    <span class="summary-value">$<%= (doc.grandTotal || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+                    <span class="summary-value">₹<%= (doc.grandTotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
                 <% } %>
             </div>

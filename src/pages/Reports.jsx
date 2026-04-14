@@ -3,6 +3,8 @@ import { api } from '../context/AuthContext.jsx';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
 import { BarChart3, TrendingUp, PieChart as PieIcon, DollarSign, FileText, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { formatCurrency } from '../utils/currency';
+
 
 const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -46,28 +48,32 @@ const Reports = () => {
             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><FileText size={20} /></div>
             <span className="text-sm text-slate-500 font-medium">Quotation Value</span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">${(stats?.totalQuotationValue || 0).toLocaleString()}</h3>
+          <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats?.totalQuotationValue)}</h3>
+
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center space-x-3 mb-2">
             <div className="p-2 bg-green-50 text-green-600 rounded-lg"><ShoppingCart size={20} /></div>
             <span className="text-sm text-slate-500 font-medium">PO Value</span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">${(stats?.totalPOValue || 0).toLocaleString()}</h3>
+          <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats?.totalPOValue)}</h3>
+
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center space-x-3 mb-2">
             <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><DollarSign size={20} /></div>
             <span className="text-sm text-slate-500 font-medium">Invoice Value</span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">${(stats?.totalInvoiceValue || 0).toLocaleString()}</h3>
+          <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats?.totalInvoiceValue)}</h3>
+
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center space-x-3 mb-2">
             <div className="p-2 bg-red-50 text-red-600 rounded-lg"><TrendingUp size={20} /></div>
             <span className="text-sm text-slate-500 font-medium">Pending Payments</span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">${(stats?.pendingPayments || 0).toLocaleString()}</h3>
+          <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats?.pendingPayments)}</h3>
+
         </div>
       </div>
 
@@ -85,7 +91,8 @@ const Reports = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                  formatter={(value) => [`$${(value || 0).toLocaleString()}`, 'Value']} />
+                  formatter={(value) => [formatCurrency(value), 'Value']} />
+
                 
                 <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={3} dot={{ r: 4, fill: '#2563eb' }} activeDot={{ r: 6 }} />
               </LineChart>
@@ -116,7 +123,8 @@ const Reports = () => {
                 </Pie>
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                  formatter={(value) => [`$${(value || 0).toLocaleString()}`, 'Spent']} />
+                  formatter={(value) => [formatCurrency(value), 'Spent']} />
+
                 
                 <Legend verticalAlign="bottom" height={36} />
               </PieChart>

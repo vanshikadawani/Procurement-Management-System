@@ -299,8 +299,8 @@
                 </svg>
             </div>
             <div class="logo-text">
-                <h1>STUDIO SHODWE</h1>
-                <p>CREATIVE AGENCY</p>
+                <h1>MERN PROCUREMENT</h1>
+                <p>PROCUREMENT MANAGEMENT</p>
             </div>
         </div>
         <div class="invoice-title">
@@ -311,7 +311,7 @@
     <div class="separator-container">
         <div class="separator-line-blue"></div>
         <div class="separator-line"></div>
-        <div class="website-text">REALLYGREATSITE.COM</div>
+        <div class="website-text">MERNPROCUREMENT.COM</div>
     </div>
 
     <% const data = (typeof invoice !== 'undefined' ? invoice : false) || (typeof doc !== 'undefined' ? doc : {}); %>
@@ -345,8 +345,9 @@
                 <td><%= index + 1 %></td>
                 <td><%= item.description || item.itemName %></td>
                 <td><%= item.qty || item.quantity %></td>
-                <td>$<%= (item.price || item.unitPrice || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) %></td>
-                <td>$<%= (item.total || ((item.qty || item.quantity|| 0) * (item.price || item.unitPrice || 0))).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) %></td>
+                <td>₹<%= (item.price || item.unitPrice || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+                <td>₹<%= (item.total || ((item.qty || item.quantity|| 0) * (item.price || item.unitPrice || 0))).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+
             </tr>
             <% }); %>
         </tbody>
@@ -356,11 +357,13 @@
         <div class="totals-table">
             <div class="totals-row">
                 <span>Sub Total :</span>
-                <span>$<%= (data.subTotal !== undefined ? data.subTotal : data.subtotal || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) %></span>
+                <span>₹<%= (data.subTotal !== undefined ? data.subTotal : data.subtotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+
             </div>
             <div class="totals-row">
-                <span>Tax <%= data.taxRate || 15 %>% :</span>
-                <span>$<%= (data.taxAmount || data.tax || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) %></span>
+                <span>Tax <%= data.taxRate || 18 %>% :</span>
+                <span>₹<%= (data.taxAmount || data.tax || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
+
             </div>
         </div>
     </div>
@@ -369,8 +372,9 @@
         <div class="payment-method">PAYMENT METHOD :</div>
         <div class="grand-total-box">
             <span>GRAND TOTAL :</span>
-            <span>$<%= (data.grandTotal || 0).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) %></span>
+            <span>₹<%= (data.grandTotal || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
         </div>
+
     </div>
 
     <div class="bank-details">
@@ -403,7 +407,7 @@
         </div>
         <div class="contact-item">
             <div class="icon-box">✉️</div>
-            <span>hello@reallygreatsite.com</span>
+            <span>contact@mernprocurement.com</span>
         </div>
         <div class="contact-item">
             <div class="icon-box">📍</div>

@@ -16,6 +16,8 @@ import paymentRoutes from './server/routes/paymentRoutes.js';
 import reportRoutes from './server/routes/reportRoutes.js';
 import pdfRoutes from './server/routes/pdfRoutes.js';
 import userRoutes from './server/routes/userRoutes.js';
+import productRoutes from './server/routes/productRoutes.js';
+
 
 dotenv.config();
 
@@ -48,6 +50,8 @@ async function startServer() {
   app.use('/api/reports', reportRoutes);
   app.use('/api/pdf', pdfRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/products', productRoutes);
+
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Procurement API is running' });

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { api, useAuth } from '../context/AuthContext.jsx';
 import { Plus, Search, CreditCard, Receipt, Calendar, DollarSign } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { formatCurrency } from '../utils/currency';
+
 import { useLocation } from 'react-router-dom';
 
 const Payments = () => {
@@ -128,7 +130,8 @@ const Payments = () => {
                     }
                     return (
                       <option key={i._id} value={i._id}>
-                        {i.invoiceNumber} - {i.vendorId?.vendorName} (${(remainingAmount || 0).toLocaleString()})
+                        {i.invoiceNumber} - {i.vendorId?.vendorName} ({formatCurrency(remainingAmount)})
+
                       </option>
                     );
                   })}
@@ -234,7 +237,8 @@ const Payments = () => {
               <tr key={p._id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 text-slate-600">{new Date(p.paymentDate).toLocaleDateString()}</td>
                   <td className="px-6 py-4 font-bold text-slate-900">{p.invoiceId?.invoiceNumber}</td>
-                  <td className="px-6 py-4 font-bold text-green-600">${(p.amountPaid || 0).toLocaleString()}</td>
+                  <td className="px-6 py-4 font-bold text-green-600">{formatCurrency(p.amountPaid)}</td>
+
                   <td className="px-6 py-4 text-slate-600">{p.paymentMethod}</td>
                   <td className="px-6 py-4 text-slate-600">{p.createdBy?.name}</td>
                 </tr>

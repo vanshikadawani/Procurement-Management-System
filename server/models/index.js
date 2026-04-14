@@ -110,4 +110,5 @@ export { default as PurchaseOrder } from "./purchaseOrder.js";
 export { default as Invoice } from "./invoice.js";
 export { default as Payment } from "./payment.js";
 export { default as ApprovalLog } from "./approvalLog.js";
+export { default as Product } from "./product.js";
 export { default as User } from "./User.js";

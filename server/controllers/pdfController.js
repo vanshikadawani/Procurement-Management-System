@@ -1,7 +1,71 @@
 import puppeteer from 'puppeteer';
 import ejs from 'ejs';
 import path from 'path';
+import fs from 'fs';
 import { Quotation, PurchaseOrder, Invoice, Payment } from '../models/index.js';
+
+export const downloadInvoicePDF = async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log("Invoice ID:", id);
+    
+    const invoiceData = await Invoice.findById(id).populate('poId').populate('createdBy', 'name').populate('vendorId');
+    console.log("Invoice Data:", invoiceData);
+    
+    if (!invoiceData) {
+      console.log("Invoice not found for ID:", id);
+      return res.status(404).json({ message: 'Document not found' });
+    }
+
+    const payments = await Payment.find({ invoiceId: id });
+    const totalPaid = payments.reduce((sum, p) => sum + (p.amountPaid || 0), 0);
+    const amountDue = invoiceData.grandTotal - totalPaid;
+    
+    const data = invoiceData.toObject();
+    
+    const templatePath = path.join(process.cwd(), 'server/templates/invoice.ejs');
+    const html = await ejs.renderFile(templatePath, {
+      doc: data,
+      type: 'INVOICE',
+      date: new Date(invoiceData.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+      totalPaid,
+      amountDue
+    });
+
+    console.log("Rendered HTML Length:", html.length);
+    if (html.length === 0) {
+      console.log("Warning: Rendered HTML is empty");
+    }
+
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdfUint8 = await page.pdf({ 
+      format: 'A4', 
+      printBackground: true,
+      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+    });
+    
+    // Convert to Buffer because Puppeteer returns Uint8Array which Express may serialize to JSON
+    const pdf = Buffer.from(pdfUint8);
+
+    await browser.close();
+
+    const filename = `invoice-${data.invoiceNumber || id}.pdf`;
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdf.length
+    });
+    res.send(pdf);
+  } catch (error) {
+    console.error("PDF Generation Error:", error);
+    res.status(500).json({ message: error instanceof Error ? error.message : 'Server error' });
+  }
+};
 
 export const generatePDF = async (req, res) => {
   try {
@@ -42,7 +106,7 @@ export const generatePDF = async (req, res) => {
     const html = await ejs.renderFile(templatePath, {
       doc: data,
       type: type.toUpperCase(),
-      date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), // formatting to "25 June 2022" style
+      date: new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), // formatting to "25 June 2022" style
       totalPaid,
       amountDue
     });
@@ -53,13 +117,17 @@ export const generatePDF = async (req, res) => {
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdf = await page.pdf({ format: 'A4', printBackground: true });
+    const pdfUint8 = await page.pdf({ format: 'A4', printBackground: true });
+    const pdf = Buffer.from(pdfUint8);
 
     await browser.close();
 
     const filename = `${type.toUpperCase()}-${data.invoiceNumber || data.poNumber || data.quotationNumber || id}.pdf`;
-    res.contentType('application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdf.length
+    });
     res.send(pdf);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Server error' });
@@ -106,12 +174,16 @@ export const generateInvoicePDF = async (req, res) => {
     await page.setContent(html, { waitUntil: 'networkidle0' });
     
     // CRITICAL: printBackground: true so colors render
-    const pdf = await page.pdf({ format: 'A4', printBackground: true });
+    const pdfUint8 = await page.pdf({ format: 'A4', printBackground: true });
+    const pdf = Buffer.from(pdfUint8);
 
     await browser.close();
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="invoice.pdf"');
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="invoice.pdf"',
+      'Content-Length': pdf.length
+    });
     res.send(pdf);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Server error' });

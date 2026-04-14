@@ -1,7 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export let UserRole = /*#__PURE__*/function (UserRole) { UserRole["USER"] = "USER"; UserRole["MANAGER"] = "MANAGER"; UserRole["ADMIN"] = "ADMIN"; return UserRole; }({});
+export const UserRole = {
+  USER: 'USER',
+  MANAGER: 'MANAGER',
+  ADMIN: 'ADMIN'
+};
 
 const UserSchema = new Schema({
   name: { type: String, required: true },
@@ -10,18 +14,14 @@ const UserSchema = new Schema({
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER }
 }, { timestamps: true });
 
-UserSchema.pre('save', function (next) {
-  const user = this;
-  if (!user.isModified('password')) return next();
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) return next(err);
-    bcrypt.hash(user.password, salt, (err, hash) => {
-      if (err) return next(err);
-      user.password = hash;
-      next();
-    });
-  });
+UserSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+  
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
+
+
 
 UserSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);

@@ -7,7 +7,9 @@ const PurchaseOrderSchema = new Schema({
     vendorId: { type: Schema.Types.ObjectId, ref: 'Vendor', required: true },
     lineItems: [{
         itemName: { type: String, required: true },
+        hsnCode: { type: String },
         quantity: { type: Number, required: true },
+
         unitPrice: { type: Number, required: true },
         tax: { type: Number, default: 0 },
         discount: { type: Number, default: 0 }

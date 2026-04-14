@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { api, useAuth } from '../context/AuthContext.jsx';
 import { Plus, Search, Receipt, Trash2, DollarSign, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { formatCurrency } from '../utils/currency';
+import { downloadPDF } from '../utils/download';
+
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const Invoices = () => {
@@ -99,44 +102,15 @@ const Invoices = () => {
     }
   };
 
-  const handleDownloadInvoice = async (invoiceId = null) => {
+  const handleDownloadPDF = async (invoiceId) => {
     try {
-      // If invoiceId is a valid string, you might want to call `/api/pdf/invoice/${invoiceId}` for real data.
-      const urlPath = (typeof invoiceId === 'string' && invoiceId) ? `/pdf/invoice/${invoiceId}` : '/pdf/download-invoice';
-      const response = await api.get(urlPath, {
-        responseType: 'blob'
-      });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      
-      // Extract filename from headers if possible
-      let filename = 'invoice.pdf';
-      const disposition = response.headers['content-disposition'];
-      if (disposition && disposition.indexOf('filename=') !== -1) {
-          const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-          const matches = filenameRegex.exec(disposition);
-          if (matches != null && matches[1]) { 
-            filename = matches[1].replace(/['"]/g, '');
-          }
-      }
-
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
-      toast.success('Invoice downloaded successfully!');
-    } catch (error) {
-      if (error.response && error.response.data instanceof Blob) {
-        const text = await error.response.data.text();
-        console.error("Download invoice error from backend:", text);
-        toast.error(`Backend error: ${JSON.parse(text).message || 'Server error'}`);
+      if (invoiceId) {
+        await downloadPDF(`/pdf/invoice/${invoiceId}`, `invoice-${invoiceId}.pdf`);
       } else {
-        console.error("Download invoice error:", error);
-        toast.error('Failed to download invoice');
+        await downloadPDF('/pdf/download-invoice', 'invoice-sample.pdf');
       }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -183,7 +157,8 @@ const Invoices = () => {
 
                 <option value="">Choose an approved PO...</option>
                 {pos.map((p) =>
-                  <option key={p._id} value={p._id}>{p.poNumber} - {p.vendorId?.vendorName} (${(p.grandTotal || 0).toLocaleString()})</option>
+                  <option key={p._id} value={p._id}>{p.poNumber} - {p.vendorId?.vendorName} ({formatCurrency(p.grandTotal)})</option>
+
                 )}
               </select>
             </div>
@@ -254,15 +229,18 @@ const Invoices = () => {
             <div className="flex flex-col items-end space-y-2 border-t border-slate-100 pt-6">
               <div className="flex justify-between w-64 text-sm">
                 <span className="text-slate-500">Subtotal:</span>
-                <span className="font-bold text-slate-900">${(totals.subtotal || 0).toLocaleString()}</span>
+                <span className="font-bold text-slate-900">{formatCurrency(totals.subtotal)}</span>
+
               </div>
               <div className="flex justify-between w-64 text-sm">
                 <span className="text-slate-500">Tax:</span>
-                <span className="font-bold text-slate-900">${(totals.tax || 0).toLocaleString()}</span>
+                <span className="font-bold text-slate-900">{formatCurrency(totals.tax)}</span>
+
               </div>
               <div className="flex justify-between w-64 text-lg border-t border-slate-200 pt-2">
                 <span className="font-bold text-slate-900">Invoice Total:</span>
-                <span className="font-bold text-blue-600">${(totals.grandTotal || 0).toLocaleString()}</span>
+                <span className="font-bold text-blue-600">{formatCurrency(totals.grandTotal)}</span>
+
               </div>
             </div>
 
@@ -317,7 +295,8 @@ const Invoices = () => {
                       <td className="px-6 py-4 font-bold text-slate-900">{i.invoiceNumber}</td>
                       <td className="px-6 py-4 text-slate-600">{i.poId?.poNumber}</td>
                       <td className="px-6 py-4 text-slate-600">{i.vendorId?.vendorName}</td>
-                      <td className="px-6 py-4 font-bold text-slate-900">${(i.grandTotal || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 font-bold text-slate-900">{formatCurrency(i.grandTotal)}</td>
+
                       <td className="px-6 py-4">
                         <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${i.status === 'Paid' ? 'bg-green-100 text-green-700' :
                             i.status === 'Partially Paid' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`
@@ -327,12 +306,13 @@ const Invoices = () => {
                       </td>
                       <td className="px-6 py-4 font-bold text-slate-900">
                         {i.status === 'Paid' || balanceDue <= 0.01 ? (
-                          <span className="text-green-600 font-semibold">$0</span>
-                        ) : i.status === 'Partially Paid' ? (
-                          <span className="text-orange-600 font-semibold">${balanceDue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                          <span className="text-green-600 font-semibold">{formatCurrency(0)}</span>
                         ) : (
-                          <span>${balanceDue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                          <span className={i.status === 'Partially Paid' ? 'text-orange-600 font-semibold' : ''}>
+                            {formatCurrency(balanceDue)}
+                          </span>
                         )}
+
                       </td>
                       <td className="px-6 py-4 text-slate-600">{i.createdBy?.name}</td>
                       <td className="px-6 py-4 text-right space-x-2">
@@ -346,7 +326,7 @@ const Invoices = () => {
                           </button>
                         }
                         <button
-                          onClick={() => handleDownloadInvoice(i._id)}
+                          onClick={() => handleDownloadPDF(i._id)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Download PDF">
                           <FileText size={18} />

@@ -3,6 +3,8 @@ import { useAuth, api } from '../context/AuthContext.jsx';
 import { FileText, ShoppingCart, Receipt, CreditCard, Users, CheckCircle, XCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { formatCurrency } from '../utils/currency';
+
 
 const StatCard = ({ title, value, icon: Icon, color }) =>
   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
@@ -41,7 +43,8 @@ const UserDashboard = ({ stats }) =>
                 <p className="text-xs text-slate-500">{q.vendorId?.vendorName}</p>
               </div>
               <div className="text-right">
-                <p className="font-bold text-slate-900">${(q.grandTotal || 0).toLocaleString()}</p>
+                <p className="font-bold text-slate-900">{formatCurrency(q.grandTotal)}</p>
+
                 <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${q.status === 'Approved' ? 'bg-green-100 text-green-700' :
                     q.status === 'Rejected' ? 'bg-red-100 text-red-700' :
                       q.status === 'Converted to PO' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`
@@ -69,7 +72,8 @@ const UserDashboard = ({ stats }) =>
                 <p className="text-xs text-slate-500">{p.vendorId?.vendorName}</p>
               </div>
               <div className="text-right">
-                <p className="font-bold text-slate-900">${(p.grandTotal || 0).toLocaleString()}</p>
+                <p className="font-bold text-slate-900">{formatCurrency(p.grandTotal)}</p>
+
                 <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${p.status === 'Approved' ? 'bg-green-100 text-green-700' :
                     p.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`
                 }>
@@ -89,8 +93,9 @@ const ManagerDashboard = ({ stats, onApprove, onReject, onConvertToPO }) =>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <StatCard title="Pending Quotations" value={stats.pendingQuotations?.length || 0} icon={FileText} color="bg-orange-500" />
       <StatCard title="Pending POs" value={stats.pendingPOs?.length || 0} icon={ShoppingCart} color="bg-blue-500" />
-      <StatCard title="Pending Payments" value={`$${(stats.pendingPaymentAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`} icon={CreditCard} color="bg-red-500" />
-      <StatCard title="Monthly Spending" value={`$${(stats.monthlySpending || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`} icon={BarChart3} color="bg-green-500" />
+      <StatCard title="Pending Payments" value={formatCurrency(stats.pendingPaymentAmount)} icon={CreditCard} color="bg-red-500" />
+      <StatCard title="Monthly Spending" value={formatCurrency(stats.monthlySpending)} icon={BarChart3} color="bg-green-500" />
+
     </div>
 
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -114,7 +119,8 @@ const ManagerDashboard = ({ stats, onApprove, onReject, onConvertToPO }) =>
               <tr key={q._id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4 font-bold text-slate-900">{q.quotationNumber}</td>
                 <td className="px-6 py-4 text-slate-600">{q.vendorId?.vendorName}</td>
-                <td className="px-6 py-4 font-bold text-slate-900">${(q.grandTotal || 0).toLocaleString()}</td>
+                <td className="px-6 py-4 font-bold text-slate-900">{formatCurrency(q.grandTotal)}</td>
+
                 <td className="px-6 py-4">
                   <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${q.status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`
                   }>
@@ -175,7 +181,8 @@ const ManagerDashboard = ({ stats, onApprove, onReject, onConvertToPO }) =>
               <tr key={p._id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4 font-bold text-slate-900">{p.poNumber}</td>
                 <td className="px-6 py-4 text-slate-600">{p.vendorId?.vendorName}</td>
-                <td className="px-6 py-4 font-bold text-slate-900">${(p.grandTotal || 0).toLocaleString()}</td>
+                <td className="px-6 py-4 font-bold text-slate-900">{formatCurrency(p.grandTotal)}</td>
+
                 <td className="px-6 py-4 text-slate-600">{p.createdBy?.name}</td>
                 <td className="px-6 py-4 text-right space-x-2">
                   <button onClick={() => onApprove(p._id, 'PO')} className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Approve">
@@ -204,7 +211,8 @@ const AdminDashboard = ({ stats, onApprove, onReject, onConvertToPO }) =>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <StatCard title="Total Users" value={stats.users || 0} icon={Users} color="bg-blue-500" />
       <StatCard title="Total Quotations" value={stats.quotations || 0} icon={FileText} color="bg-purple-500" />
-      <StatCard title="Total PO Value" value={`$${(stats.poValue || 0).toLocaleString()}`} icon={ShoppingCart} color="bg-green-500" />
+      <StatCard title="Total PO Value" value={formatCurrency(stats.poValue)} icon={ShoppingCart} color="bg-green-500" />
+
       <StatCard title="Pending Approvals" value={stats.pendingApprovals || 0} icon={CheckCircle} color="bg-orange-500" />
     </div>
     <ManagerDashboard stats={stats} onApprove={onApprove} onReject={onReject} onConvertToPO={onConvertToPO} />
