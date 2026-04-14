@@ -28,7 +28,12 @@ export const downloadInvoicePDF = async (req, res) => {
     });
 
     browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage', 
+        '--disable-gpu'
+      ],
       headless: true
     });
     const page = await browser.newPage();
@@ -96,7 +101,12 @@ export const generatePDF = async (req, res) => {
     });
 
     browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage', 
+        '--disable-gpu'
+      ],
       headless: true
     });
     const page = await browser.newPage();
@@ -149,7 +159,12 @@ export const generateInvoicePDF = async (req, res) => {
     });
 
     browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage', 
+        '--disable-gpu'
+      ],
       headless: true
     });
     const page = await browser.newPage();
